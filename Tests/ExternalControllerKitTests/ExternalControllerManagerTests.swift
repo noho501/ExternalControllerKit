@@ -82,7 +82,9 @@ final class ExternalControllerManagerTests: XCTestCase {
 
             provider.send(InputEvent(deviceId: "pad1", inputId: "left_stick_x", value: .axis(-0.75)))
 
-            XCTAssertEqual(triggered, [("action.look", .axis(-0.75))])
+            XCTAssertEqual(triggered.count, 1)
+            XCTAssertEqual(triggered.first?.0, "action.look")
+            XCTAssertEqual(triggered.first?.1, .axis(-0.75))
         }
     }
 
