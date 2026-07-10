@@ -4,10 +4,10 @@ ExternalControllerKit is a generic SDK for mapping external hardware input to ho
 
 ## What it solves
 
-- Normalize supported external input providers into shared button events.
+- Normalize supported external input providers into shared input events.
 - Persist per-device mappings.
 - Expose exclusive listening mode for configuration flows.
-- Emit action IDs only so the host app controls behavior.
+- Emit action IDs with input values so the host app controls behavior.
 - Offer an optional UIKit mapping UI for parity migrations.
 
 ## Supported providers
@@ -42,8 +42,8 @@ controller.configure(actions: [
 ])
 controller.start()
 
-let observation = controller.observe(onActionTriggered: { actionId, deviceId, buttonId in
-    print("Host executes behavior for \(actionId) from \(deviceId) / \(buttonId)")
+let observation = controller.observe(onActionTriggered: { actionId, deviceId, inputId, value in
+    print("Host executes behavior for \(actionId) from \(deviceId) / \(inputId) with \(value)")
 })
 ```
 
@@ -57,19 +57,19 @@ Actions are host-defined. Each `ActionDefinition` includes:
 - optional `sortOrder`
 - optional metadata dictionary
 
-The SDK stores and emits only `actionId` values.
+The SDK stores action IDs and emits `actionId` plus the triggering `InputValue`.
 
 ## Listening and mapping flow
 
 1. Select a device.
 2. Call `startListening(for:)`.
-3. The next pressed button from the selected device is assigned.
+3. The next pressed digital button from the selected device is assigned.
 4. Existing conflicts on that same device are replaced.
 5. Listening ends automatically after a successful assignment.
 
 ## Runtime callback handling
 
-When `ExternalController` is idle and input is enabled, mapped button presses emit action events through:
+When `ExternalController` is idle and input is enabled, mapped inputs emit action events through:
 
 - delegate callbacks
 - observation closures
@@ -100,7 +100,7 @@ Customizable surfaces include:
 - logger
 - notification names
 - UI localization strings
-- UI button label formatting
+- UI input label formatting
 - UI device filtering and sorting
 - UI action sorting
 
@@ -140,4 +140,4 @@ See `Docs/Migration.md` and `Docs/Architecture.md` for more detail.
 
 - v1 intentionally excludes BLE and CoreBluetooth.
 - Controller-specific stable IDs depend on the best attributes exposed by Apple frameworks.
-- Future releases can add optional providers, including BLE, without changing the action-ID-only runtime model.
+- Future releases can add optional providers, including BLE, without changing the action-mapping runtime model.

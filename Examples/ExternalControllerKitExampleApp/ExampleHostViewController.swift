@@ -42,8 +42,8 @@ final class ExampleHostViewController: UIViewController {
             logView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
 
-        observation = controller.observe(onActionTriggered: { [weak self] actionId, deviceId, buttonId in
-            self?.appendLog("Triggered actionId=\(actionId) deviceId=\(deviceId) buttonId=\(buttonId)")
+        observation = controller.observe(onActionTriggered: { [weak self] actionId, deviceId, inputId, value in
+            self?.appendLog("Triggered actionId=\(actionId) deviceId=\(deviceId) inputId=\(inputId) value=\(value)")
         })
         appendLog("Configured host-defined actions. Runtime callbacks remain host-controlled.")
     }

@@ -14,7 +14,7 @@ controller.start()
 
 - `startListening(for:)`
 - `stopListening()`
-- `assign(deviceId:buttonId:actionId:)`
+- `assign(deviceId:inputId:actionId:)`
 - `mapping(for:deviceId:)`
 - `mappings(for:)`
 - `allMappings()`
@@ -32,6 +32,10 @@ controller.start()
 - `delegate`
 - `observe(...)`
 - NotificationCenter notifications in `ExternalControllerNotifications.swift`
+
+Runtime action callbacks include `actionId`, `deviceId`, `inputId`, and `InputValue`.
+
+Listening mode still assigns only digital button activation events.
 
 ## Persistence
 

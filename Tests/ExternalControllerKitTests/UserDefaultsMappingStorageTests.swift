@@ -7,7 +7,7 @@ final class UserDefaultsMappingStorageTests: XCTestCase {
         let defaults = UserDefaults(suiteName: #function)!
         defaults.removePersistentDomain(forName: #function)
         let storage = UserDefaultsMappingStorage(defaults: defaults, storageKey: "mappings", legacyStorageKey: nil, shouldMigrateLegacyKey: false)
-        let mappings = [Mapping(deviceId: "keyboard", buttonId: "KEY_A", actionId: "action.jump")]
+        let mappings = [Mapping(deviceId: "keyboard", inputId: "key_a", actionId: "action.jump")]
 
         try storage.saveMappings(mappings)
 
@@ -26,14 +26,13 @@ final class UserDefaultsMappingStorageTests: XCTestCase {
     func testLegacyMigrationLoadsAndRewritesPrimaryKey() throws {
         let defaults = UserDefaults(suiteName: #function)!
         defaults.removePersistentDomain(forName: #function)
-        let legacyMappings = [Mapping(deviceId: "midi", buttonId: "CC_7", actionId: "action.volume")]
-        let data = try JSONEncoder().encode(legacyMappings)
+        let data = Data(#"[{"deviceId":"midi","buttonId":"CC_7","actionId":"action.volume"}]"#.utf8)
         defaults.set(data, forKey: "external_controller_mappings")
         let storage = UserDefaultsMappingStorage(defaults: defaults, storageKey: "new_mappings", legacyStorageKey: "external_controller_mappings", shouldMigrateLegacyKey: true)
 
         let loaded = try storage.loadMappings()
 
-        XCTAssertEqual(loaded, legacyMappings)
+        XCTAssertEqual(loaded, [Mapping(deviceId: "midi", inputId: "cc_7", actionId: "action.volume")])
         XCTAssertNil(defaults.object(forKey: "external_controller_mappings"))
         XCTAssertNotNil(defaults.data(forKey: "new_mappings"))
     }

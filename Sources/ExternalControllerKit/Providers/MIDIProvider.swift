@@ -96,22 +96,25 @@ public final class MIDIProvider: ExternalControllerProvider {
         switch type {
         case 0x90:
             if data2 == 0 {
-                emit(deviceId: device.id, buttonId: "NOTE_\(data1)", isPressed: false)
+                emit(deviceId: device.id, inputId: "note_\(data1)", value: .button(false))
             } else {
-                emit(deviceId: device.id, buttonId: "NOTE_\(data1)", isPressed: true)
+                emit(deviceId: device.id, inputId: "note_\(data1)", value: .button(true))
             }
         case 0x80:
-            emit(deviceId: device.id, buttonId: "NOTE_\(data1)", isPressed: false)
+            emit(deviceId: device.id, inputId: "note_\(data1)", value: .button(false))
         case 0xB0:
-            emit(deviceId: device.id, buttonId: "CC_\(data1)", isPressed: data2 > 0)
+            emit(deviceId: device.id, inputId: "cc_\(data1)", value: .integer(Int(data2)))
+        case 0xE0:
+            let pitchBend = Int(UInt16(data1) | (UInt16(data2) << 7)) - 8192
+            emit(deviceId: device.id, inputId: "pitch_bend", value: .integer(pitchBend))
         default:
             break
         }
     }
 
-    private func emit(deviceId: String, buttonId: String, isPressed: Bool) {
-        logger.log(level: .debug, message: "MIDI event \(deviceId) \(buttonId) pressed=\(isPressed)")
-        delegate?.provider(self, didReceive: ButtonEvent(deviceId: deviceId, buttonId: buttonId, isPressed: isPressed))
+    private func emit(deviceId: String, inputId: String, value: InputValue) {
+        logger.log(level: .debug, message: "MIDI event \(deviceId) \(inputId) value=\(value)")
+        delegate?.provider(self, didReceive: InputEvent(deviceId: deviceId, inputId: inputId, value: value))
     }
 
     private func makeDevice(for endpoint: MIDIEndpointRef) -> Device {

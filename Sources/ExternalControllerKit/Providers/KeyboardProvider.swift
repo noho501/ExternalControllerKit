@@ -64,9 +64,9 @@ public final class KeyboardProvider: ExternalControllerProvider {
     private func bindKeyboardInput(_ keyboard: GCKeyboard, deviceId: String) {
         keyboard.keyboardInput?.keyChangedHandler = { [weak self] _, keyCode, _, isPressed in
             guard let self else { return }
-            let buttonId = Self.normalizedButtonId(for: keyCode)
-            logger.log(level: .debug, message: "Keyboard event \(deviceId) \(buttonId) pressed=\(isPressed)")
-            delegate?.provider(self, didReceive: ButtonEvent(deviceId: deviceId, buttonId: buttonId, isPressed: isPressed))
+            let inputId = Self.normalizedInputId(for: keyCode)
+            logger.log(level: .debug, message: "Keyboard event \(deviceId) \(inputId) pressed=\(isPressed)")
+            delegate?.provider(self, didReceive: InputEvent(deviceId: deviceId, inputId: inputId, value: .button(isPressed)))
         }
     }
 
@@ -76,43 +76,43 @@ public final class KeyboardProvider: ExternalControllerProvider {
         return Device(id: id, name: name, kind: .keyboard)
     }
 
-    private static func normalizedButtonId(for keyCode: GCKeyCode) -> String {
+    private static func normalizedInputId(for keyCode: GCKeyCode) -> String {
         let description = String(describing: keyCode)
         if description.hasPrefix("key"), let scalar = description.last {
-            return "KEY_\(String(scalar).uppercased())"
+            return "key_\(String(scalar).lowercased())"
         }
         if let functionIndex = Int(description.dropFirst()), description.first == "f" {
-            return "F\(functionIndex)"
+            return "key_f\(functionIndex)"
         }
         switch description {
-        case "zero": return "DIGIT_0"
-        case "one": return "DIGIT_1"
-        case "two": return "DIGIT_2"
-        case "three": return "DIGIT_3"
-        case "four": return "DIGIT_4"
-        case "five": return "DIGIT_5"
-        case "six": return "DIGIT_6"
-        case "seven": return "DIGIT_7"
-        case "eight": return "DIGIT_8"
-        case "nine": return "DIGIT_9"
-        case "spacebar": return "SPACE"
-        case "tab": return "TAB"
-        case "returnOrEnter": return "ENTER"
-        case "escape": return "ESCAPE"
-        case "deleteOrBackspace": return "BACKSPACE"
-        case "leftArrow": return "ARROW_LEFT"
-        case "rightArrow": return "ARROW_RIGHT"
-        case "upArrow": return "ARROW_UP"
-        case "downArrow": return "ARROW_DOWN"
-        case "leftShift": return "LEFT_SHIFT"
-        case "rightShift": return "RIGHT_SHIFT"
-        case "leftControl": return "LEFT_CONTROL"
-        case "rightControl": return "RIGHT_CONTROL"
-        case "leftAlt": return "LEFT_OPTION"
-        case "rightAlt": return "RIGHT_OPTION"
-        case "leftGUI": return "LEFT_COMMAND"
-        case "rightGUI": return "RIGHT_COMMAND"
-        default: return "KEY_RAW_\(keyCode.rawValue)"
+        case "zero": return "key_0"
+        case "one": return "key_1"
+        case "two": return "key_2"
+        case "three": return "key_3"
+        case "four": return "key_4"
+        case "five": return "key_5"
+        case "six": return "key_6"
+        case "seven": return "key_7"
+        case "eight": return "key_8"
+        case "nine": return "key_9"
+        case "spacebar": return "key_space"
+        case "tab": return "key_tab"
+        case "returnOrEnter": return "key_enter"
+        case "escape": return "key_escape"
+        case "deleteOrBackspace": return "key_backspace"
+        case "leftArrow": return "key_left_arrow"
+        case "rightArrow": return "key_right_arrow"
+        case "upArrow": return "key_up_arrow"
+        case "downArrow": return "key_down_arrow"
+        case "leftShift": return "key_left_shift"
+        case "rightShift": return "key_right_shift"
+        case "leftControl": return "key_left_control"
+        case "rightControl": return "key_right_control"
+        case "leftAlt": return "key_left_option"
+        case "rightAlt": return "key_right_option"
+        case "leftGUI": return "key_left_command"
+        case "rightGUI": return "key_right_command"
+        default: return "key_raw_\(keyCode.rawValue)"
         }
     }
     #endif

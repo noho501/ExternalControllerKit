@@ -13,5 +13,7 @@ public enum ExternalControllerNotificationUserInfoKey {
     public static let state = "state"
     public static let actionId = "actionId"
     public static let deviceId = "deviceId"
+    public static let inputId = "inputId"
+    public static let inputValue = "inputValue"
     public static let buttonId = "buttonId"
 }
