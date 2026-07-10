@@ -4,3 +4,8 @@ DerivedData/
 Packages/
 *.xcodeproj
 *.xcworkspace
+!Examples/ExternalControllerKitExampleApp/ExternalControllerKitExampleApp.xcodeproj/
+!Examples/ExternalControllerKitExampleApp/ExternalControllerKitExampleApp.xcodeproj/project.pbxproj
+!Examples/ExternalControllerKitExampleApp/ExternalControllerKitExampleApp.xcodeproj/xcshareddata/
+!Examples/ExternalControllerKitExampleApp/ExternalControllerKitExampleApp.xcodeproj/xcshareddata/xcschemes/
+!Examples/ExternalControllerKitExampleApp/ExternalControllerKitExampleApp.xcodeproj/xcshareddata/xcschemes/ExternalControllerKitExampleApp.xcscheme

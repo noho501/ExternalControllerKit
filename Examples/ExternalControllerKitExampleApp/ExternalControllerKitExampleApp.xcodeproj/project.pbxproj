@@ -1,0 +1,370 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00C355F5B83BE52245EBE9B2 /* ExternalControllerKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7FAF23B3F13BC3B713A99F17 /* ExternalControllerKitUI */; };
+		304591127D98CAE11FF26861 /* ExternalControllerKitExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2220DB02592E1E9446F501C7 /* ExternalControllerKitExampleApp.swift */; };
+		3E87446271FFD3313622315F /* ExampleHostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57573BDA3E2BC5D6E16C580 /* ExampleHostViewController.swift */; };
+		CB8DD4D9CBFEB6FE8134EBC5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FA3373EE992C3BBF4F84096 /* Foundation.framework */; };
+		E71A34245A1409EC826A3387 /* ExternalControllerKit in Frameworks */ = {isa = PBXBuildFile; productRef = DE569E3C9D8E92F55D3D7499 /* ExternalControllerKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2220DB02592E1E9446F501C7 /* ExternalControllerKitExampleApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ExternalControllerKitExampleApp.swift; sourceTree = "<group>"; };
+		3FA3373EE992C3BBF4F84096 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		A57573BDA3E2BC5D6E16C580 /* ExampleHostViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ExampleHostViewController.swift; sourceTree = "<group>"; };
+		D9FE46ED124296C78313E7CE /* ExternalControllerKitExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExternalControllerKitExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B155A8D95BED86B541C6D6C2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB8DD4D9CBFEB6FE8134EBC5 /* Foundation.framework in Frameworks */,
+				E71A34245A1409EC826A3387 /* ExternalControllerKit in Frameworks */,
+				00C355F5B83BE52245EBE9B2 /* ExternalControllerKitUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		31FF451CFF7655C67B4889CD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B922908FD1F387DAFC388760 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		68DDDEC8E948D95298506C8A = {
+			isa = PBXGroup;
+			children = (
+				882761EE53C8D942F7F6ED7B /* Products */,
+				31FF451CFF7655C67B4889CD /* Frameworks */,
+				7B2C508023721CB92A94C017 /* ExternalControllerKitExampleApp */,
+			);
+			sourceTree = "<group>";
+		};
+		7B2C508023721CB92A94C017 /* ExternalControllerKitExampleApp */ = {
+			isa = PBXGroup;
+			children = (
+				2220DB02592E1E9446F501C7 /* ExternalControllerKitExampleApp.swift */,
+				A57573BDA3E2BC5D6E16C580 /* ExampleHostViewController.swift */,
+			);
+			name = ExternalControllerKitExampleApp;
+			sourceTree = "<group>";
+		};
+		882761EE53C8D942F7F6ED7B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D9FE46ED124296C78313E7CE /* ExternalControllerKitExampleApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B922908FD1F387DAFC388760 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				3FA3373EE992C3BBF4F84096 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8CFD20ECE6819A4FBC06338E /* ExternalControllerKitExampleApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2E4134A17D7E2146286A79E6 /* Build configuration list for PBXNativeTarget "ExternalControllerKitExampleApp" */;
+			buildPhases = (
+				D412468ED106EDC0EBC2A1C5 /* Sources */,
+				B155A8D95BED86B541C6D6C2 /* Frameworks */,
+				4D9CE8B1AE202C73939A4A13 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ExternalControllerKitExampleApp;
+			packageProductDependencies = (
+				DE569E3C9D8E92F55D3D7499 /* ExternalControllerKit */,
+				7FAF23B3F13BC3B713A99F17 /* ExternalControllerKitUI */,
+			);
+			productName = ExternalControllerKitExampleApp;
+			productReference = D9FE46ED124296C78313E7CE /* ExternalControllerKitExampleApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7ECFCA69D1FE8C96B3203079 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = A81CA80C8CEA6BD9E2B51211 /* Build configuration list for PBXProject "ExternalControllerKitExampleApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 68DDDEC8E948D95298506C8A;
+			minimizedProjectReferenceProxies = 0;
+			packageReferences = (
+				A0321F24328BBE0CF8610092 /* XCLocalSwiftPackageReference ".." */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 882761EE53C8D942F7F6ED7B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8CFD20ECE6819A4FBC06338E /* ExternalControllerKitExampleApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4D9CE8B1AE202C73939A4A13 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D412468ED106EDC0EBC2A1C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				304591127D98CAE11FF26861 /* ExternalControllerKitExampleApp.swift in Sources */,
+				3E87446271FFD3313622315F /* ExampleHostViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2490B53BD567C94AC4E9FEC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6D9E66A0668D6A49A7D2A2D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		7B28A0C9599E296404FB8DCD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ExternalControllerKitExampleApp;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.noho501.ExternalControllerKitExampleApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FE0036C3B69957740B3EF8BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ExternalControllerKitExampleApp;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.noho501.ExternalControllerKitExampleApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2E4134A17D7E2146286A79E6 /* Build configuration list for PBXNativeTarget "ExternalControllerKitExampleApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B28A0C9599E296404FB8DCD /* Release */,
+				FE0036C3B69957740B3EF8BE /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A81CA80C8CEA6BD9E2B51211 /* Build configuration list for PBXProject "ExternalControllerKitExampleApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2490B53BD567C94AC4E9FEC1 /* Debug */,
+				6D9E66A0668D6A49A7D2A2D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A0321F24328BBE0CF8610092 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			path = ../..;
+			relativePath = ../..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7FAF23B3F13BC3B713A99F17 /* ExternalControllerKitUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0321F24328BBE0CF8610092 /* XCLocalSwiftPackageReference ".." */;
+			productName = ExternalControllerKitUI;
+		};
+		DE569E3C9D8E92F55D3D7499 /* ExternalControllerKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0321F24328BBE0CF8610092 /* XCLocalSwiftPackageReference ".." */;
+			productName = ExternalControllerKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 7ECFCA69D1FE8C96B3203079 /* Project object */;
+}
