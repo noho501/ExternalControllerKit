@@ -3,10 +3,22 @@ import PackageDescription
 
 let package = Package(
     name: "ExternalControllerKit",
-    products: [
-        .library(name: "ExternalControllerKit", targets: ["ExternalControllerKit"]),
-        .library(name: "ExternalControllerKitUI", targets: ["ExternalControllerKitUI"])
+
+    platforms: [
+        .iOS(.v15)
     ],
+
+    products: [
+        .library(
+            name: "ExternalControllerKit",
+            targets: ["ExternalControllerKit"]
+        ),
+        .library(
+            name: "ExternalControllerKitUI",
+            targets: ["ExternalControllerKitUI"]
+        )
+    ],
+
     targets: [
         .target(
             name: "ExternalControllerKit",
@@ -24,11 +36,11 @@ let package = Package(
         ),
         .testTarget(
             name: "ExternalControllerKitUITests",
-            dependencies: ["ExternalControllerKitUI", "ExternalControllerKit"],
+            dependencies: [
+                "ExternalControllerKitUI",
+                "ExternalControllerKit"
+            ],
             path: "Tests/ExternalControllerKitUITests"
         )
-    ],
-    platforms: [
-        .iOS(.v15)
-    ],
+    ]
 )
