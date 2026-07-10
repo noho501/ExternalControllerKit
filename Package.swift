@@ -27,5 +27,8 @@ let package = Package(
             dependencies: ["ExternalControllerKitUI", "ExternalControllerKit"],
             path: "Tests/ExternalControllerKitUITests"
         )
-    ]
+    ],
+    platforms: [
+        .iOS(.v15)
+    ],
 )
