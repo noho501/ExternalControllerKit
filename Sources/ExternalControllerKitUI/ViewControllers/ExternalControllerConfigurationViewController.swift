@@ -131,6 +131,7 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
 
     private func makeLayout(for traits: UITraitCollection) -> UICollectionViewLayout {
         let columns: Int
+
         if traits.horizontalSizeClass == .compact {
             columns = 1
         } else if traits.verticalSizeClass == .regular {
@@ -139,13 +140,35 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
             columns = 3
         }
 
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(110))
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0 / CGFloat(columns)),
+            heightDimension: .estimated(110)
+        )
+
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(110))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, repeatingSubitem: item, count: columns)
+
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(110)
+        )
+
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: groupSize,
+            subitem: item,
+            count: columns
+        )
+
         group.interItemSpacing = .fixed(12)
+
         let section = NSCollectionLayoutSection(group: group)
         section.interGroupSpacing = 12
+        section.contentInsets = NSDirectionalEdgeInsets(
+            top: 12,
+            leading: 16,
+            bottom: 12,
+            trailing: 16
+        )
+
         return UICollectionViewCompositionalLayout(section: section)
     }
 }

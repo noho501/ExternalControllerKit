@@ -22,15 +22,29 @@ public final class GameControllerProvider: ExternalControllerProvider {
         #if canImport(GameController)
         guard observers.isEmpty else { return }
         let center = NotificationCenter.default
-        observers.append(center.addObserver(forName: .GCControllerDidConnect, object: nil, queue: .main) { [weak self] notification in
-            guard let controller = notification.object as? GCController else { return }
-            self?.register(controller: controller)
-        })
-        observers.append(center.addObserver(forName: .GCControllerDidDisconnect, object: nil, queue: .main) { [weak self] notification in
-            guard let controller = notification.object as? GCController else { return }
-            self?.unregister(controller: controller)
-        })
-        refreshConnectedDevices()
+        observers.append(
+            center.addObserver(
+                forName: .GCControllerDidConnect,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                Task { @MainActor in
+                    self?.refreshConnectedDevices()
+                }
+            }
+        )
+
+        observers.append(
+            center.addObserver(
+                forName: .GCControllerDidDisconnect,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                Task { @MainActor in
+                    self?.refreshConnectedDevices()
+                }
+            }
+        )
         #endif
     }
 
@@ -143,7 +157,7 @@ public final class GameControllerProvider: ExternalControllerProvider {
             .filter { !$0.isEmpty }
             .joined(separator: "|")
         let name = vendor?.isEmpty == false ? vendor! : (product.isEmpty ? "Game Controller" : product)
-        return Device(id: "gc_\(stableSeed.replacingOccurrences(of: " ", with: "_").lowercased())", name: name, kind: .gameController, batteryLevel: controller.battery?.batteryLevel)
+        return Device(id: "gc_\(stableSeed.replacingOccurrences(of: " ", with: "_").lowercased())", name: name, kind: .gameController, batteryLevel: Double(controller.battery?.batteryLevel ?? 0))
     }
     #endif
 }
