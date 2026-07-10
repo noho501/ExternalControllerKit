@@ -16,13 +16,16 @@ final class ActionMappingCell: UICollectionViewCell {
         contentView.layer.borderColor = UIColor.separator.cgColor
 
         titleLabel.font = .preferredFont(forTextStyle: .headline)
+        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.numberOfLines = 0
 
         detailLabel.font = .preferredFont(forTextStyle: .subheadline)
+        detailLabel.adjustsFontForContentSizeCategory = true
         detailLabel.textColor = .secondaryLabel
         detailLabel.numberOfLines = 0
 
         listeningLabel.font = .preferredFont(forTextStyle: .footnote)
+        listeningLabel.adjustsFontForContentSizeCategory = true
         listeningLabel.textColor = .systemBlue
         listeningLabel.numberOfLines = 0
         listeningLabel.isHidden = true

@@ -8,17 +8,20 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
     private let uiConfiguration: ExternalControllerUIConfiguration
     private var observation: ExternalControllerObservation?
     private var actions: [ActionDefinition] = []
+    private let collectionLayout = UICollectionViewFlowLayout()
+    private var lastLaidOutCollectionWidth: CGFloat = 0
 
-    private let selectedDeviceLabel = UILabel()
     private let deviceButton = UIButton(type: .system)
-    private let refreshButton = UIButton(type: .system)
     private lazy var collectionView: UICollectionView = {
-        let view = UICollectionView(frame: .zero, collectionViewLayout: makeLayout(for: traitCollection))
+        let view = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
         view.backgroundColor = .systemBackground
         view.register(ActionMappingCell.self, forCellWithReuseIdentifier: ActionMappingCell.reuseIdentifier)
         view.delegate = self
         view.dataSource = self
         view.translatesAutoresizingMaskIntoConstraints = false
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshRequested), for: .valueChanged)
+        view.refreshControl = refreshControl
         return view
     }()
 
@@ -43,28 +46,18 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: uiConfiguration.localization.closeButtonTitle, style: .plain, target: self, action: #selector(closeTapped))
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: uiConfiguration.localization.resetAllButtonTitle, style: .plain, target: self, action: #selector(resetAllTapped))
 
-        selectedDeviceLabel.text = uiConfiguration.localization.selectedDeviceLabel
-        selectedDeviceLabel.font = .preferredFont(forTextStyle: .subheadline)
+        configureDeviceButton()
+        configureCollectionLayout()
 
-        deviceButton.configuration = .bordered()
-        refreshButton.configuration = .bordered()
-        refreshButton.setTitle(uiConfiguration.localization.refreshButtonTitle, for: .normal)
-        refreshButton.addTarget(self, action: #selector(refreshTapped), for: .touchUpInside)
-
-        let deviceStack = UIStackView(arrangedSubviews: [selectedDeviceLabel, deviceButton, refreshButton])
-        deviceStack.axis = .horizontal
-        deviceStack.spacing = 12
-        deviceStack.alignment = .center
-        deviceStack.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(deviceStack)
+        view.addSubview(deviceButton)
         view.addSubview(collectionView)
 
         NSLayoutConstraint.activate([
-            deviceStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            deviceStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            deviceStack.trailingAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            collectionView.topAnchor.constraint(equalTo: deviceStack.bottomAnchor, constant: 16),
+            deviceButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            deviceButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            deviceButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            deviceButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
+            collectionView.topAnchor.constraint(equalTo: deviceButton.bottomAnchor, constant: 16),
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
@@ -85,15 +78,15 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         reloadDevicesAndActions()
     }
 
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateCollectionLayoutIfNeeded(for: collectionView.bounds.width)
+    }
+
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         controller.stopListening()
         controller.setInputEnabled(true)
-    }
-
-    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        collectionView.setCollectionViewLayout(makeLayout(for: traitCollection), animated: false)
     }
 
     @objc private func closeTapped() {
@@ -106,18 +99,20 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         controller.resetAllMappings()
     }
 
-    @objc private func refreshTapped() {
+    @objc private func refreshRequested() {
         controller.refreshConnectedDevices()
     }
 
     private func reloadDevicesAndActions() {
         actions = uiConfiguration.actionSort(controller.actionDefinitions)
         let devices = uiConfiguration.deviceSort(uiConfiguration.deviceFilter(controller.connectedDevices))
-        let currentTitle = devices.first(where: { $0.id == controller.selectedDeviceId })?.name ?? "-"
-        deviceButton.setTitle(currentTitle, for: .normal)
+        let currentTitle = devices.first(where: { $0.id == controller.selectedDeviceId })?.name ?? "Select Device"
+        updateDeviceButtonTitle(currentTitle)
         deviceButton.menu = makeDeviceMenu(devices: devices)
         deviceButton.showsMenuAsPrimaryAction = true
+        collectionView.refreshControl?.endRefreshing()
         collectionView.reloadData()
+        updateCollectionLayoutIfNeeded(for: collectionView.bounds.width)
     }
 
     private func makeDeviceMenu(devices: [Device]) -> UIMenu {
@@ -129,47 +124,60 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         return UIMenu(title: uiConfiguration.localization.selectedDeviceLabel, children: actions)
     }
 
-    private func makeLayout(for traits: UITraitCollection) -> UICollectionViewLayout {
-        let columns: Int
+    private func configureDeviceButton() {
+        var configuration = UIButton.Configuration.bordered()
+        configuration.image = UIImage(systemName: "chevron.down")
+        configuration.imagePlacement = .trailing
+        configuration.imagePadding = 8
+        configuration.titleAlignment = .leading
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)
+        deviceButton.configuration = configuration
+        deviceButton.translatesAutoresizingMaskIntoConstraints = false
+        deviceButton.showsMenuAsPrimaryAction = true
+        deviceButton.contentHorizontalAlignment = .leading
+        deviceButton.titleLabel?.font = .preferredFont(forTextStyle: .body)
+        deviceButton.titleLabel?.adjustsFontForContentSizeCategory = true
+        deviceButton.titleLabel?.lineBreakMode = .byTruncatingTail
+        deviceButton.titleLabel?.numberOfLines = 1
+    }
 
-        if traits.horizontalSizeClass == .compact {
-            columns = 1
-        } else if traits.verticalSizeClass == .regular {
-            columns = 2
-        } else {
-            columns = 3
+    private func configureCollectionLayout() {
+        collectionLayout.minimumInteritemSpacing = 12
+        collectionLayout.minimumLineSpacing = 12
+        collectionLayout.sectionInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+    }
+
+    private func updateDeviceButtonTitle(_ title: String) {
+        var configuration = deviceButton.configuration
+        configuration?.title = title
+        deviceButton.configuration = configuration
+    }
+
+    private func updateCollectionLayoutIfNeeded(for width: CGFloat) {
+        let roundedWidth = width.rounded(.down)
+        guard roundedWidth > 0 else { return }
+        guard roundedWidth != lastLaidOutCollectionWidth else { return }
+
+        lastLaidOutCollectionWidth = roundedWidth
+
+        let columns = numberOfColumns(for: roundedWidth)
+        let totalSpacing = CGFloat(columns - 1) * collectionLayout.minimumInteritemSpacing
+        let availableWidth = roundedWidth - collectionLayout.sectionInset.left - collectionLayout.sectionInset.right - totalSpacing
+        let itemWidth = floor(availableWidth / CGFloat(columns))
+
+        collectionLayout.itemSize = CGSize(width: itemWidth, height: 120)
+        collectionLayout.invalidateLayout()
+    }
+
+    private func numberOfColumns(for width: CGFloat) -> Int {
+        switch width {
+        case 900...:
+            3
+        case 500...:
+            2
+        default:
+            1
         }
-
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0 / CGFloat(columns)),
-            heightDimension: .estimated(110)
-        )
-
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(110)
-        )
-
-        let group = NSCollectionLayoutGroup.horizontal(
-            layoutSize: groupSize,
-            subitem: item,
-            count: columns
-        )
-
-        group.interItemSpacing = .fixed(12)
-
-        let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 12
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: 12,
-            leading: 16,
-            bottom: 12,
-            trailing: 16
-        )
-
-        return UICollectionViewCompositionalLayout(section: section)
     }
 }
 
