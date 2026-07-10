@@ -2,7 +2,6 @@
 import UIKit
 import ExternalControllerKit
 
-@MainActor
 public final class ExternalControllerConfigurationViewController: UIViewController {
     private let controller: ExternalController
     private let uiConfiguration: ExternalControllerUIConfiguration
