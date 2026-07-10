@@ -46,7 +46,7 @@ public final class KeyboardProvider: ExternalControllerProvider {
         let previousIds = Set(devices.keys)
         var refreshed: [String: Device] = [:]
         if let keyboard = GCKeyboard.coalesced {
-            let device = makeDevice(for: keyboard)
+            let device = makeDevice()
             refreshed[device.id] = device
             bindKeyboardInput(keyboard, deviceId: device.id)
         }
@@ -62,7 +62,7 @@ public final class KeyboardProvider: ExternalControllerProvider {
 
     #if canImport(GameController)
     private func bindKeyboardInput(_ keyboard: GCKeyboard, deviceId: String) {
-        keyboard.keyboardInput?.keyChangedHandler = { [weak self] _, keyCode, _, isPressed in
+        keyboard.keyboardInput?.keyChangedHandler = { [weak self] _, _, keyCode, isPressed in
             guard let self else { return }
             let inputId = Self.normalizedInputId(for: keyCode)
             logger.log(level: .debug, message: "Keyboard event \(deviceId) \(inputId) pressed=\(isPressed)")
@@ -70,10 +70,12 @@ public final class KeyboardProvider: ExternalControllerProvider {
         }
     }
 
-    private func makeDevice(for keyboard: GCKeyboard) -> Device {
-        let id = "gc_keyboard_coalesced"
-        let name = keyboard.coalesced == nil ? "Keyboard" : "System Keyboard"
-        return Device(id: id, name: name, kind: .keyboard)
+    private func makeDevice() -> Device {
+       return Device(
+            id: "gc_keyboard",
+            name: "Keyboard",
+            kind: .keyboard
+        )
     }
 
     private static func normalizedInputId(for keyCode: GCKeyCode) -> String {

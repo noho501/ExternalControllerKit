@@ -136,6 +136,14 @@ See `Docs/Migration.md` and `Docs/Architecture.md` for more detail.
 - persistent mappings across relaunch through the shared controller
 - selected-device listening behavior
 
+To run the sample app in Xcode:
+
+1. Open `Examples/ExternalControllerKitExampleApp/ExternalControllerKitExampleApp.xcodeproj`.
+2. Select the `ExternalControllerKitExampleApp` scheme.
+3. Run on an iOS 15+ simulator or device.
+
+The sample project uses the package in this repository through a local Swift Package dependency, so changes under `Sources/` are reflected directly in the sample app.
+
 ## Limitations and roadmap
 
 - v1 intentionally excludes BLE and CoreBluetooth.
