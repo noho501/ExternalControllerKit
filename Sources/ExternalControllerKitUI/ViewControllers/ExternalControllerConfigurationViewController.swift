@@ -52,13 +52,23 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         view.addSubview(collectionView)
 
         NSLayoutConstraint.activate([
+
             deviceButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            deviceButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            deviceButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+
+            deviceButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
             deviceButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
+
+            deviceButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+
+            deviceButton.trailingAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+
             collectionView.topAnchor.constraint(equalTo: deviceButton.bottomAnchor, constant: 16),
+
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
 
@@ -164,7 +174,7 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         let availableWidth = roundedWidth - collectionLayout.sectionInset.left - collectionLayout.sectionInset.right - totalSpacing
         let itemWidth = floor(availableWidth / CGFloat(columns))
 
-        collectionLayout.itemSize = CGSize(width: itemWidth, height: 120)
+        collectionLayout.itemSize = CGSize(width: itemWidth, height: 60)
         collectionLayout.invalidateLayout()
     }
 

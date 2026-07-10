@@ -2,38 +2,50 @@
 import UIKit
 
 final class ActionMappingCell: UICollectionViewCell {
+
     static let reuseIdentifier = "ActionMappingCell"
 
     private let titleLabel = UILabel()
     private let detailLabel = UILabel()
-    private let listeningLabel = UILabel()
+    private let spacer = UIView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+
         contentView.backgroundColor = .secondarySystemBackground
         contentView.layer.cornerRadius = 12
         contentView.layer.borderWidth = 1
         contentView.layer.borderColor = UIColor.separator.cgColor
 
-        titleLabel.font = .preferredFont(forTextStyle: .headline)
+        titleLabel.font = .preferredFont(forTextStyle: .body)
         titleLabel.adjustsFontForContentSizeCategory = true
-        titleLabel.numberOfLines = 0
+        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        titleLabel.numberOfLines = 1
 
-        detailLabel.font = .preferredFont(forTextStyle: .subheadline)
+        detailLabel.font = .preferredFont(forTextStyle: .body)
         detailLabel.adjustsFontForContentSizeCategory = true
         detailLabel.textColor = .secondaryLabel
-        detailLabel.numberOfLines = 0
+        detailLabel.textAlignment = .right
+        detailLabel.numberOfLines = 1
+        detailLabel.lineBreakMode = .byTruncatingMiddle
 
-        listeningLabel.font = .preferredFont(forTextStyle: .footnote)
-        listeningLabel.adjustsFontForContentSizeCategory = true
-        listeningLabel.textColor = .systemBlue
-        listeningLabel.numberOfLines = 0
-        listeningLabel.isHidden = true
+        titleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        titleLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-        let stack = UIStackView(arrangedSubviews: [titleLabel, detailLabel, listeningLabel])
-        stack.axis = .vertical
-        stack.spacing = 8
+        detailLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        detailLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+
+        let stack = UIStackView(arrangedSubviews: [
+            titleLabel,
+            spacer,
+            detailLabel
+        ])
+
+        stack.axis = .horizontal
+        stack.alignment = .center
+        stack.spacing = 12
         stack.translatesAutoresizingMaskIntoConstraints = false
+
         contentView.addSubview(stack)
 
         NSLayoutConstraint.activate([
@@ -48,12 +60,26 @@ final class ActionMappingCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(title: String, detail: String, listeningText: String?, isListening: Bool) {
+    func configure(
+        title: String,
+        detail: String,
+        listeningText: String?,
+        isListening: Bool
+    ) {
+
         titleLabel.text = title
-        detailLabel.text = detail
-        listeningLabel.text = listeningText
-        listeningLabel.isHidden = !isListening
-        contentView.layer.borderColor = isListening ? UIColor.systemBlue.cgColor : UIColor.separator.cgColor
+
+        if isListening {
+            detailLabel.text = listeningText
+            detailLabel.textColor = .systemBlue
+            contentView.layer.borderColor = UIColor.systemBlue.cgColor
+        } else {
+            detailLabel.text = detail
+            detailLabel.textColor = detail == "Unmapped"
+                ? .tertiaryLabel
+                : .secondaryLabel
+            contentView.layer.borderColor = UIColor.separator.cgColor
+        }
     }
 }
 #endif
