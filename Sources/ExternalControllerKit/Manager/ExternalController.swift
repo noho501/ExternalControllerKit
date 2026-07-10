@@ -4,7 +4,17 @@ public protocol ExternalControllerDelegate: AnyObject {
     func externalController(_ controller: ExternalController, didChangeConnectedDevices devices: [Device])
     func externalController(_ controller: ExternalController, didChangeMappings mappings: [Mapping])
     func externalController(_ controller: ExternalController, didChangeState state: ManagerState)
+    func externalController(_ controller: ExternalController, didTriggerAction actionId: String, deviceId: String, inputId: String, value: InputValue)
     func externalController(_ controller: ExternalController, didTriggerAction actionId: String, deviceId: String, buttonId: String)
+}
+
+public extension ExternalControllerDelegate {
+    func externalController(_ controller: ExternalController, didTriggerAction actionId: String, deviceId: String, inputId: String, value: InputValue) {
+        guard value.isDigitalActivation else { return }
+        externalController(controller, didTriggerAction: actionId, deviceId: deviceId, buttonId: inputId)
+    }
+
+    func externalController(_ controller: ExternalController, didTriggerAction actionId: String, deviceId: String, buttonId: String) {}
 }
 
 @MainActor
@@ -15,7 +25,7 @@ public final class ExternalController: ExternalControllerProviderDelegate {
     public var onDevicesChanged: (([Device]) -> Void)?
     public var onMappingsChanged: (([Mapping]) -> Void)?
     public var onStateChanged: ((ManagerState) -> Void)?
-    public var onActionTriggered: ((String, String, String) -> Void)?
+    public var onActionTriggered: ((String, String, String, InputValue) -> Void)?
 
     public private(set) var connectedDevices: [Device] = []
     public private(set) var selectedDeviceId: String?
@@ -109,9 +119,14 @@ public final class ExternalController: ExternalControllerProviderDelegate {
         publishStateChanged()
     }
 
-    public func assign(deviceId: String, buttonId: String, actionId: String) {
-        assignInternal(deviceId: deviceId, buttonId: buttonId, actionId: actionId)
+    public func assign(deviceId: String, inputId: String, actionId: String) {
+        assignInternal(deviceId: deviceId, inputId: inputId, actionId: actionId)
         publishMappingsChanged()
+    }
+
+    @available(*, deprecated, renamed: "assign(deviceId:inputId:actionId:)")
+    public func assign(deviceId: String, buttonId: String, actionId: String) {
+        assign(deviceId: deviceId, inputId: buttonId, actionId: actionId)
     }
 
     public func mapping(for actionId: String, deviceId: String) -> Mapping? {
@@ -136,7 +151,7 @@ public final class ExternalController: ExternalControllerProviderDelegate {
         onDevicesChanged: (([Device]) -> Void)? = nil,
         onMappingsChanged: (([Mapping]) -> Void)? = nil,
         onStateChanged: ((ManagerState) -> Void)? = nil,
-        onActionTriggered: ((String, String, String) -> Void)? = nil
+        onActionTriggered: ((String, String, String, InputValue) -> Void)? = nil
     ) -> ExternalControllerObservation {
         let id = UUID()
         observations[id] = ObservationHandlers(
@@ -150,21 +165,23 @@ public final class ExternalController: ExternalControllerProviderDelegate {
         }
     }
 
-    public func provider(_ provider: any ExternalControllerProvider, didReceive event: ButtonEvent) {
-        guard event.isPressed else { return }
-
+    public func provider(_ provider: any ExternalControllerProvider, didReceive event: InputEvent) {
         switch state {
         case .listening(let actionId):
-            guard event.deviceId == selectedDeviceId else { return }
-            assignInternal(deviceId: event.deviceId, buttonId: event.buttonId, actionId: actionId)
+            guard event.deviceId == selectedDeviceId, event.value.isDigitalActivation else { return }
+            assignInternal(deviceId: event.deviceId, inputId: event.inputId, actionId: actionId)
             publishMappingsChanged()
             state = .idle
             publishStateChanged()
         case .idle:
-            guard isInputEnabled, let mapping = mappings.first(where: { $0.deviceId == event.deviceId && $0.buttonId == event.buttonId }) else {
+            guard isInputEnabled else { return }
+            if event.value.kind == "button", event.value.boolValue != true {
                 return
             }
-            publishActionTriggered(actionId: mapping.actionId, deviceId: event.deviceId, buttonId: event.buttonId)
+            guard let mapping = mappings.first(where: { $0.deviceId == event.deviceId && $0.inputId == event.inputId }) else {
+                return
+            }
+            publishActionTriggered(actionId: mapping.actionId, deviceId: event.deviceId, inputId: event.inputId, value: event.value)
         }
     }
 
@@ -204,12 +221,12 @@ public final class ExternalController: ExternalControllerProviderDelegate {
         }
     }
 
-    private func assignInternal(deviceId: String, buttonId: String, actionId: String) {
+    private func assignInternal(deviceId: String, inputId: String, actionId: String) {
         mappings.removeAll { mapping in
-            (mapping.deviceId == deviceId && mapping.buttonId == buttonId) ||
+            (mapping.deviceId == deviceId && mapping.inputId == inputId) ||
             (mapping.deviceId == deviceId && mapping.actionId == actionId)
         }
-        mappings.append(Mapping(deviceId: deviceId, buttonId: buttonId, actionId: actionId))
+        mappings.append(Mapping(deviceId: deviceId, inputId: inputId, actionId: actionId))
         persistMappings(clearWhenEmpty: false)
     }
 
@@ -270,11 +287,11 @@ public final class ExternalController: ExternalControllerProviderDelegate {
         )
     }
 
-    private func publishActionTriggered(actionId: String, deviceId: String, buttonId: String) {
-        delegate?.externalController(self, didTriggerAction: actionId, deviceId: deviceId, buttonId: buttonId)
-        onActionTriggered?(actionId, deviceId, buttonId)
+    private func publishActionTriggered(actionId: String, deviceId: String, inputId: String, value: InputValue) {
+        delegate?.externalController(self, didTriggerAction: actionId, deviceId: deviceId, inputId: inputId, value: value)
+        onActionTriggered?(actionId, deviceId, inputId, value)
         for observer in observations.values {
-            observer.onActionTriggered?(actionId, deviceId, buttonId)
+            observer.onActionTriggered?(actionId, deviceId, inputId, value)
         }
         notificationCenter.post(
             name: notificationConfiguration.actionTriggered,
@@ -282,7 +299,9 @@ public final class ExternalController: ExternalControllerProviderDelegate {
             userInfo: [
                 ExternalControllerNotificationUserInfoKey.actionId: actionId,
                 ExternalControllerNotificationUserInfoKey.deviceId: deviceId,
-                ExternalControllerNotificationUserInfoKey.buttonId: buttonId
+                ExternalControllerNotificationUserInfoKey.inputId: inputId,
+                ExternalControllerNotificationUserInfoKey.buttonId: inputId,
+                ExternalControllerNotificationUserInfoKey.inputValue: value
             ]
         )
     }
@@ -292,5 +311,5 @@ private struct ObservationHandlers {
     let onDevicesChanged: (([Device]) -> Void)?
     let onMappingsChanged: (([Mapping]) -> Void)?
     let onStateChanged: ((ManagerState) -> Void)?
-    let onActionTriggered: ((String, String, String) -> Void)?
+    let onActionTriggered: ((String, String, String, InputValue) -> Void)?
 }

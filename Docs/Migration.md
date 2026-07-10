@@ -25,3 +25,10 @@
 - Verify persistence across relaunch.
 - Verify listening only accepts the selected device.
 - Verify runtime input accepts events from all mapped devices.
+
+## Input-event upgrade
+
+- Replace button-specific runtime handling with `InputEvent(deviceId:inputId:value:)`.
+- Keep persisted mappings keyed by `deviceId` and `inputId`.
+- Update host callbacks to consume `InputValue`.
+- Keep listening mode restricted to digital activation events.

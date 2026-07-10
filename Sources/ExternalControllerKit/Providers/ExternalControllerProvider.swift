@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public protocol ExternalControllerProviderDelegate: AnyObject {
-    func provider(_ provider: any ExternalControllerProvider, didReceive event: ButtonEvent)
+    func provider(_ provider: any ExternalControllerProvider, didReceive event: InputEvent)
     func provider(_ provider: any ExternalControllerProvider, didConnect device: Device)
     func provider(_ provider: any ExternalControllerProvider, didDisconnect device: Device)
 }

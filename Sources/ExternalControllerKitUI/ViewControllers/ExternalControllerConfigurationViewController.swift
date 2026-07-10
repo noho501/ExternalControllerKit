@@ -159,7 +159,7 @@ extension ExternalControllerConfigurationViewController: UICollectionViewDataSou
         let action = actions[indexPath.item]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ActionMappingCell.reuseIdentifier, for: indexPath) as! ActionMappingCell
         let mapping = controller.selectedDeviceId.flatMap { controller.mapping(for: action.actionId, deviceId: $0) }
-        let detail = mapping.map { uiConfiguration.buttonLabelFormatter($0.buttonId) } ?? uiConfiguration.localization.unmappedValue
+        let detail = mapping.map { uiConfiguration.buttonLabelFormatter($0.inputId) } ?? uiConfiguration.localization.unmappedValue
         let isListening: Bool
         switch controller.state {
         case .listening(let actionId): isListening = actionId == action.actionId
