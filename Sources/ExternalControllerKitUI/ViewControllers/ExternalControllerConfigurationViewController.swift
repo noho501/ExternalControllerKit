@@ -3,6 +3,8 @@ import UIKit
 import ExternalControllerKit
 
 public final class ExternalControllerConfigurationViewController: UIViewController {
+    private static let learnMoreURL = URL(string: "external-controller-kit://learn-more")!
+
     private let controller: ExternalController
     private let uiConfiguration: ExternalControllerUIConfiguration
     private var observation: ExternalControllerObservation?
@@ -11,6 +13,9 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
     private var lastLaidOutCollectionWidth: CGFloat = 0
 
     private let deviceButton = UIButton(type: .system)
+    private let headerContainerView = UIView()
+    private let headerStackView = UIStackView()
+    private let descriptionTextView = UITextView()
     private lazy var collectionView: UICollectionView = {
         let view = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
         view.backgroundColor = .systemBackground
@@ -46,24 +51,16 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: uiConfiguration.localization.resetAllButtonTitle, style: .plain, target: self, action: #selector(resetAllTapped))
 
         configureDeviceButton()
+        configureDescriptionTextView()
+        configureHeader()
         configureCollectionLayout()
+        updateDescriptionText()
 
-        view.addSubview(deviceButton)
         view.addSubview(collectionView)
+        collectionView.addSubview(headerContainerView)
 
         NSLayoutConstraint.activate([
-
-            deviceButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-
-            deviceButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-
-            deviceButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
-
-            deviceButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-
-            deviceButton.trailingAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-
-            collectionView.topAnchor.constraint(equalTo: deviceButton.bottomAnchor, constant: 16),
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
 
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
 
@@ -89,7 +86,15 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
 
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        updateHeaderLayout(for: collectionView.bounds.width)
         updateCollectionLayoutIfNeeded(for: collectionView.bounds.width)
+    }
+
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        updateDescriptionText()
+        updateHeaderLayout(for: collectionView.bounds.width)
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
@@ -115,12 +120,13 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
     private func reloadDevicesAndActions() {
         actions = uiConfiguration.actionSort(controller.actionDefinitions)
         let devices = uiConfiguration.deviceSort(uiConfiguration.deviceFilter(controller.connectedDevices))
-        let currentTitle = devices.first(where: { $0.id == controller.selectedDeviceId })?.name ?? "Select Device"
+        let currentTitle = devices.first(where: { $0.id == controller.selectedDeviceId })?.name ?? uiConfiguration.localization.selectedDeviceLabel
         updateDeviceButtonTitle(currentTitle)
         deviceButton.menu = makeDeviceMenu(devices: devices)
         deviceButton.showsMenuAsPrimaryAction = true
         collectionView.refreshControl?.endRefreshing()
         collectionView.reloadData()
+        updateHeaderLayout(for: collectionView.bounds.width)
         updateCollectionLayoutIfNeeded(for: collectionView.bounds.width)
     }
 
@@ -150,16 +156,110 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         deviceButton.titleLabel?.numberOfLines = 1
     }
 
+    private func configureDescriptionTextView() {
+        descriptionTextView.backgroundColor = .clear
+        descriptionTextView.delegate = self
+        descriptionTextView.font = .preferredFont(forTextStyle: .body)
+        descriptionTextView.adjustsFontForContentSizeCategory = true
+        descriptionTextView.textColor = .secondaryLabel
+        descriptionTextView.isEditable = false
+        descriptionTextView.isSelectable = true
+        descriptionTextView.isScrollEnabled = false
+        descriptionTextView.textContainerInset = .zero
+        descriptionTextView.textContainer.lineFragmentPadding = 0
+    }
+
+    private func configureHeader() {
+        headerContainerView.backgroundColor = .clear
+
+        headerStackView.axis = .vertical
+        headerStackView.alignment = .fill
+        headerStackView.spacing = 12
+        headerStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        headerContainerView.addSubview(headerStackView)
+        headerStackView.addArrangedSubview(deviceButton)
+        headerStackView.addArrangedSubview(descriptionTextView)
+
+        NSLayoutConstraint.activate([
+            headerStackView.topAnchor.constraint(equalTo: headerContainerView.topAnchor),
+            headerStackView.leadingAnchor.constraint(equalTo: headerContainerView.leadingAnchor),
+            headerStackView.trailingAnchor.constraint(equalTo: headerContainerView.trailingAnchor),
+            headerStackView.bottomAnchor.constraint(equalTo: headerContainerView.bottomAnchor)
+        ])
+    }
+
     private func configureCollectionLayout() {
         collectionLayout.minimumInteritemSpacing = 12
         collectionLayout.minimumLineSpacing = 12
-        collectionLayout.sectionInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        collectionLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 12, right: 0)
     }
 
     private func updateDeviceButtonTitle(_ title: String) {
         var configuration = deviceButton.configuration
         configuration?.title = title
         deviceButton.configuration = configuration
+    }
+
+    private func updateDescriptionText() {
+        guard let rawDescription = uiConfiguration.headerDescription?.trimmingCharacters(in: .whitespacesAndNewlines), !rawDescription.isEmpty else {
+            descriptionTextView.attributedText = nil
+            descriptionTextView.isHidden = true
+            return
+        }
+
+        let font = UIFont.preferredFont(forTextStyle: .body)
+        descriptionTextView.linkTextAttributes = [
+            .font: font,
+            .foregroundColor: UIColor.systemBlue
+        ]
+
+        let descriptionAttributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: UIColor.secondaryLabel
+        ]
+
+        let attributedText = NSMutableAttributedString(string: rawDescription, attributes: descriptionAttributes)
+        if let rawLearnMoreTitle = uiConfiguration.learnMoreTitle?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !rawLearnMoreTitle.isEmpty,
+           uiConfiguration.onLearnMore != nil {
+            attributedText.append(NSAttributedString(string: " ", attributes: descriptionAttributes))
+            attributedText.append(NSAttributedString(
+                string: rawLearnMoreTitle,
+                attributes: [
+                    .font: font,
+                    .foregroundColor: UIColor.systemBlue,
+                    .link: Self.learnMoreURL
+                ]
+            ))
+        }
+
+        descriptionTextView.attributedText = attributedText
+        descriptionTextView.isHidden = false
+    }
+
+    private func updateHeaderLayout(for width: CGFloat) {
+        let roundedWidth = width.rounded(.down)
+        guard roundedWidth > 0 else { return }
+
+        headerContainerView.bounds = CGRect(x: 0, y: 0, width: roundedWidth, height: 0)
+        headerContainerView.setNeedsLayout()
+        headerContainerView.layoutIfNeeded()
+
+        let targetSize = CGSize(width: roundedWidth, height: UIView.layoutFittingCompressedSize.height)
+        let headerHeight = ceil(headerContainerView.systemLayoutSizeFitting(
+            targetSize,
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        ).height)
+
+        headerContainerView.frame = CGRect(x: 0, y: 0, width: roundedWidth, height: headerHeight)
+        let updatedTopInset = headerHeight + 12
+        if collectionLayout.sectionInset.top != updatedTopInset {
+            collectionLayout.sectionInset.top = updatedTopInset
+            collectionLayout.invalidateLayout()
+        }
+        collectionView.verticalScrollIndicatorInsets.top = headerHeight
     }
 
     private func updateCollectionLayoutIfNeeded(for width: CGFloat) {
@@ -216,6 +316,19 @@ extension ExternalControllerConfigurationViewController: UICollectionViewDataSou
 
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         controller.startListening(for: actions[indexPath.item].actionId)
+    }
+}
+
+extension ExternalControllerConfigurationViewController: UITextViewDelegate {
+    public func textView(
+        _ textView: UITextView,
+        shouldInteractWith URL: URL,
+        in characterRange: NSRange,
+        interaction: UITextItemInteraction
+    ) -> Bool {
+        guard URL == Self.learnMoreURL else { return true }
+        uiConfiguration.onLearnMore?()
+        return false
     }
 }
 #endif
