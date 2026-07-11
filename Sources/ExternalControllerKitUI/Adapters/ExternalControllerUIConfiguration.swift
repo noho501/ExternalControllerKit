@@ -29,6 +29,9 @@ public struct ExternalControllerUIConfiguration {
     public var deviceFilter: @Sendable ([Device]) -> [Device]
     public var deviceSort: @Sendable ([Device]) -> [Device]
     public var actionSort: @Sendable ([ActionDefinition]) -> [ActionDefinition]
+    public var headerDescription: String?
+    public var learnMoreTitle: String?
+    public var onLearnMore: (() -> Void)?
 
     public init(
         localization: any ExternalControllerLocalizationProviding = DefaultExternalControllerLocalizationProvider(),
@@ -44,13 +47,19 @@ public struct ExternalControllerUIConfiguration {
                 if lhsOrder != rhsOrder { return lhsOrder < rhsOrder }
                 return $0.displayTitle.localizedCaseInsensitiveCompare($1.displayTitle) == .orderedAscending
             }
-        }
+        },
+        headerDescription: String? = nil,
+        learnMoreTitle: String? = nil,
+        onLearnMore: (() -> Void)? = nil
     ) {
         self.localization = localization
         self.buttonLabelFormatter = buttonLabelFormatter
         self.deviceFilter = deviceFilter
         self.deviceSort = deviceSort
         self.actionSort = actionSort
+        self.headerDescription = headerDescription
+        self.learnMoreTitle = learnMoreTitle
+        self.onLearnMore = onLearnMore
     }
 }
 #endif

@@ -49,7 +49,19 @@ final class ExampleHostViewController: UIViewController {
     }
 
     @objc private func openMappingUI() {
-        let navigationController = UINavigationController(rootViewController: ExternalControllerConfigurationViewController(controller: controller))
+        let uiConfiguration = ExternalControllerUIConfiguration(
+            headerDescription: "Connect your gamepad, keyboard, MIDI controller or BLE remote before assigning actions.",
+            learnMoreTitle: "Learn More",
+            onLearnMore: {
+                UIApplication.shared.open(URL(string: "https://github.com/noho501/ExternalControllerKit")!)
+            }
+        )
+        let navigationController = UINavigationController(
+            rootViewController: ExternalControllerConfigurationViewController(
+                controller: controller,
+                uiConfiguration: uiConfiguration
+            )
+        )
         present(navigationController, animated: true)
     }
 
