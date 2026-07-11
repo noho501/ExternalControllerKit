@@ -13,6 +13,7 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
     private var lastLaidOutCollectionWidth: CGFloat = 0
 
     private let deviceButton = UIButton(type: .system)
+    private let deviceContainer = UIView()
     private let headerContainerView = UIView()
     private let headerStackView = UIStackView()
     private let descriptionTextView = UITextView()
@@ -144,12 +145,12 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         configuration.image = UIImage(systemName: "chevron.down")
         configuration.imagePlacement = .trailing
         configuration.imagePadding = 8
-        configuration.titleAlignment = .leading
+        configuration.titleAlignment = .center
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)
         deviceButton.configuration = configuration
         deviceButton.translatesAutoresizingMaskIntoConstraints = false
         deviceButton.showsMenuAsPrimaryAction = true
-        deviceButton.contentHorizontalAlignment = .leading
+        deviceButton.contentHorizontalAlignment = .center
         deviceButton.titleLabel?.font = .preferredFont(forTextStyle: .body)
         deviceButton.titleLabel?.adjustsFontForContentSizeCategory = true
         deviceButton.titleLabel?.lineBreakMode = .byTruncatingTail
@@ -177,8 +178,23 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         headerStackView.spacing = 12
         headerStackView.translatesAutoresizingMaskIntoConstraints = false
 
+        deviceContainer.translatesAutoresizingMaskIntoConstraints = false
+        deviceButton.translatesAutoresizingMaskIntoConstraints = false
+
+        deviceContainer.addSubview(deviceButton)
+
+        NSLayoutConstraint.activate([
+            deviceButton.centerXAnchor.constraint(equalTo: deviceContainer.centerXAnchor),
+            deviceButton.topAnchor.constraint(equalTo: deviceContainer.topAnchor),
+            deviceButton.bottomAnchor.constraint(equalTo: deviceContainer.bottomAnchor),
+
+            deviceButton.leadingAnchor.constraint(greaterThanOrEqualTo: deviceContainer.leadingAnchor),
+            deviceButton.trailingAnchor.constraint(lessThanOrEqualTo: deviceContainer.trailingAnchor)
+        ])
+
         headerContainerView.addSubview(headerStackView)
-        headerStackView.addArrangedSubview(deviceButton)
+
+        headerStackView.addArrangedSubview(deviceContainer)
         headerStackView.addArrangedSubview(descriptionTextView)
 
         NSLayoutConstraint.activate([
@@ -188,7 +204,7 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
             headerStackView.bottomAnchor.constraint(equalTo: headerContainerView.bottomAnchor)
         ])
     }
-
+    
     private func configureCollectionLayout() {
         collectionLayout.minimumInteritemSpacing = 12
         collectionLayout.minimumLineSpacing = 12
@@ -208,7 +224,7 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
             return
         }
 
-        let font = UIFont.preferredFont(forTextStyle: .body)
+        let font = UIFont.preferredFont(forTextStyle: .footnote)
         descriptionTextView.linkTextAttributes = [
             .font: font,
             .foregroundColor: UIColor.systemBlue
