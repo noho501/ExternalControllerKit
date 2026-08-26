@@ -2,15 +2,56 @@
 import UIKit
 import ExternalControllerKit
 
+private final class ActionMappingSectionHeader: UICollectionReusableView {
+    static let reuseIdentifier = "ActionMappingSectionHeader"
+
+    private let titleLabel = UILabel()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        backgroundColor = .systemBackground
+        titleLabel.font = .preferredFont(forTextStyle: .headline)
+        titleLabel.adjustsFontForContentSizeCategory = true
+        titleLabel.textColor = .label
+        titleLabel.numberOfLines = 1
+        titleLabel.lineBreakMode = .byTruncatingTail
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        addSubview(titleLabel)
+
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 4),
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -4)
+        ])
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func configure(title: String) {
+        titleLabel.text = title
+    }
+}
+
 public final class ExternalControllerConfigurationViewController: UIViewController {
+    private struct ActionSection {
+        let title: String?
+        var actions: [ActionDefinition]
+    }
+
     private static let learnMoreURL = URL(string: "external-controller-kit://learn-more")!
 
     private let controller: ExternalController
     private let uiConfiguration: ExternalControllerUIConfiguration
     private var observation: ExternalControllerObservation?
-    private var actions: [ActionDefinition] = []
+    private var actionSections: [ActionSection] = []
     private let collectionLayout = UICollectionViewFlowLayout()
     private var lastLaidOutCollectionWidth: CGFloat = 0
+    private var headerHeight: CGFloat = 0
 
     private let deviceButton = UIButton(type: .system)
     private let deviceContainer = UIView()
@@ -21,6 +62,11 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         let view = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
         view.backgroundColor = .systemBackground
         view.register(ActionMappingCell.self, forCellWithReuseIdentifier: ActionMappingCell.reuseIdentifier)
+        view.register(
+            ActionMappingSectionHeader.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: ActionMappingSectionHeader.reuseIdentifier
+        )
         view.delegate = self
         view.dataSource = self
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -37,7 +83,7 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         self.controller = controller
         self.uiConfiguration = uiConfiguration
         super.init(nibName: nil, bundle: nil)
-        self.actions = uiConfiguration.actionSort(controller.actionDefinitions)
+        self.actionSections = Self.makeActionSections(from: uiConfiguration.actionSort(controller.actionDefinitions))
     }
 
     required init?(coder: NSCoder) {
@@ -62,7 +108,6 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
 
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
 
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
@@ -119,7 +164,7 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
     }
 
     private func reloadDevicesAndActions() {
-        actions = uiConfiguration.actionSort(controller.actionDefinitions)
+        actionSections = Self.makeActionSections(from: uiConfiguration.actionSort(controller.actionDefinitions))
         let devices = uiConfiguration.deviceSort(uiConfiguration.deviceFilter(controller.connectedDevices))
         let currentTitle = devices.first(where: { $0.id == controller.selectedDeviceId })?.name ?? uiConfiguration.localization.selectedDeviceLabel
         updateDeviceButtonTitle(currentTitle)
@@ -129,6 +174,23 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         collectionView.reloadData()
         updateHeaderLayout(for: collectionView.bounds.width)
         updateCollectionLayoutIfNeeded(for: collectionView.bounds.width)
+    }
+
+    private static func makeActionSections(from actions: [ActionDefinition]) -> [ActionSection] {
+        var sectionIndices: [String?: Int] = [:]
+        var sections: [ActionSection] = []
+
+        for action in actions {
+            let title = action.groupingKey?.isEmpty == true ? nil : action.groupingKey
+            if let sectionIndex = sectionIndices[title] {
+                sections[sectionIndex].actions.append(action)
+            } else {
+                sectionIndices[title] = sections.count
+                sections.append(ActionSection(title: title, actions: [action]))
+            }
+        }
+
+        return sections
     }
 
     private func makeDeviceMenu(devices: [Device]) -> UIMenu {
@@ -172,6 +234,7 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
 
     private func configureHeader() {
         headerContainerView.backgroundColor = .clear
+        headerContainerView.translatesAutoresizingMaskIntoConstraints = true
 
         headerStackView.axis = .vertical
         headerStackView.alignment = .fill
@@ -258,24 +321,33 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
         let roundedWidth = width.rounded(.down)
         guard roundedWidth > 0 else { return }
 
+        let wasAtTop = collectionView.contentOffset.y <= -collectionView.adjustedContentInset.top + 1
         headerContainerView.bounds = CGRect(x: 0, y: 0, width: roundedWidth, height: 0)
         headerContainerView.setNeedsLayout()
         headerContainerView.layoutIfNeeded()
 
         let targetSize = CGSize(width: roundedWidth, height: UIView.layoutFittingCompressedSize.height)
-        let headerHeight = ceil(headerContainerView.systemLayoutSizeFitting(
+        let measuredHeight = ceil(headerContainerView.systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         ).height)
+        let topInset = measuredHeight + 12
 
-        headerContainerView.frame = CGRect(x: 0, y: 0, width: roundedWidth, height: headerHeight)
-        let updatedTopInset = headerHeight + 12
-        if collectionLayout.sectionInset.top != updatedTopInset {
-            collectionLayout.sectionInset.top = updatedTopInset
+        headerContainerView.frame = CGRect(x: 0, y: -topInset, width: roundedWidth, height: measuredHeight)
+        if headerHeight != measuredHeight {
+            headerHeight = measuredHeight
             collectionLayout.invalidateLayout()
         }
-        collectionView.verticalScrollIndicatorInsets.top = headerHeight
+
+        collectionView.contentInset.top = topInset
+        collectionView.verticalScrollIndicatorInsets.top = topInset
+        if wasAtTop {
+            collectionView.setContentOffset(
+                CGPoint(x: collectionView.contentOffset.x, y: -collectionView.adjustedContentInset.top),
+                animated: false
+            )
+        }
     }
 
     private func updateCollectionLayoutIfNeeded(for width: CGFloat) {
@@ -306,13 +378,17 @@ public final class ExternalControllerConfigurationViewController: UIViewControll
     }
 }
 
-extension ExternalControllerConfigurationViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+extension ExternalControllerConfigurationViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    public func numberOfSections(in collectionView: UICollectionView) -> Int {
+        actionSections.count
+    }
+
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        actions.count
+        actionSections[section].actions.count
     }
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let action = actions[indexPath.item]
+        let action = actionSections[indexPath.section].actions[indexPath.item]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ActionMappingCell.reuseIdentifier, for: indexPath) as! ActionMappingCell
         let mapping = controller.selectedDeviceId.flatMap { controller.mapping(for: action.actionId, deviceId: $0) }
         let detail = mapping.map { uiConfiguration.buttonLabelFormatter($0.inputId) } ?? uiConfiguration.localization.unmappedValue
@@ -330,8 +406,44 @@ extension ExternalControllerConfigurationViewController: UICollectionViewDataSou
         return cell
     }
 
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: ActionMappingSectionHeader.reuseIdentifier,
+            for: indexPath
+        ) as! ActionMappingSectionHeader
+        header.configure(title: actionSections[indexPath.section].title ?? "")
+        return header
+    }
+
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        guard actionSections[section].title != nil else { return .zero }
+        return CGSize(width: collectionView.bounds.width, height: 32)
+    }
+
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        insetForSectionAt section: Int
+    ) -> UIEdgeInsets {
+        UIEdgeInsets(
+            top: 0,
+            left: self.collectionLayout.sectionInset.left,
+            bottom: self.collectionLayout.sectionInset.bottom,
+            right: self.collectionLayout.sectionInset.right
+        )
+    }
+
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        controller.startListening(for: actions[indexPath.item].actionId)
+        controller.startListening(for: actionSections[indexPath.section].actions[indexPath.item].actionId)
     }
 }
 
